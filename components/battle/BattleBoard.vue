@@ -1,15 +1,32 @@
 <template>
-  <div class="w-1/2 h-1/2 bg-red-200">
-    Test
+  <div>
+    <div class="battle-scene"></div>
+    <div class="battle-bottom">
+      <BattleText></BattleText>
+      <BattleMenu></BattleMenu>
+    </div>
   </div>
 </template>
 
 <script>
-export default {
 
+export default {
+  data: () => ({
+  }),
 }
 </script>
 
 <style lang="scss">
+  .battle-scene{
+    width: 720px;
+    height: 336px;
 
+    background-image: url("/images/battle_scene.jpg");
+    background-size: contain;
+  }
+
+  .battle-bottom{
+    @apply px-0.5 py-1 relative;
+    background: $border-color;
+  }
 </style>

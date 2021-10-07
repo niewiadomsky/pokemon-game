@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "core-js": "^3.15.1",
-    "nuxt": "^2.15.7"
+    "fs": "^0.0.1-security",
+    "nuxt": "^2.15.7",
+    "pokemon-assets": "^0.6.0"
   },
   "devDependencies": {
     "@nuxtjs/style-resources": "^1.2.1",

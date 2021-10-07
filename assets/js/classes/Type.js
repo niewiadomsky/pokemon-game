@@ -1,23 +1,29 @@
 export default class Type{
   #name
-  #iconUrl
-  #effectiveness = []
+  #slug
+  #icon
+  #effectiveness
 
-  constructor(name, iconUrl, effectiveness) {
+  constructor(name, slug, icon, effectiveness) {
     this.#name = name
-    this.#iconUrl = iconUrl
+    this.#slug = slug
+    this.#icon = icon
     this.#effectiveness = effectiveness
   }
 
   get name() {
-    return this.#name;
+    return this.#name
   }
 
-  get iconUrl() {
-    return this.#iconUrl;
+  get icon() {
+    return this.#icon
   }
 
   get effectiveness() {
-    return this.#effectiveness;
+    return this.#effectiveness
+  }
+
+  get slug() {
+    return this.#slug
   }
 }

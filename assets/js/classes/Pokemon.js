@@ -4,21 +4,23 @@ export default class Pokemon {
   #maxHp
   #currentHp
   #moves = []
-  #spriteUrl
+  #sprite
   #experience = 0
   #type
+  #gender
 
   //Todo abilities
   //Todo stats
 
-  constructor(name, type, level, maxHp, moves, spriteUrl){
+  constructor(name, type, level, maxHp, moves, sprite, gender){
     this.#name = name
     this.#level = name
     this.#type = type
     this.#maxHp = maxHp
     this.#currentHp = maxHp
     this.#moves = moves
-    this.#spriteUrl = spriteUrl
+    this.#sprite = sprite
+    this.#gender = gender
 
   }
 
@@ -51,8 +53,12 @@ export default class Pokemon {
     return this.#moves;
   }
 
-  get spriteUrl() {
-    return this.#spriteUrl;
+  get gender() {
+    return this.#gender;
+  }
+
+  get sprite() {
+    return this.#sprite;
   }
 
   set currentHp(value) {
