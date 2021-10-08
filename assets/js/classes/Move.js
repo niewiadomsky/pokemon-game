@@ -1,45 +1,29 @@
 export default class Move {
-  #name
-  #type
-  #category
-  #accuracy
-  #pp
-  #power
+  name
+  type
+  category
+  accuracy
+  currentPp
+  maxPp
+  power
+  priority
+  highCriticalHitRatio
+  effect
 
-  constructor(name, type, category, accuracy, pp, power){
-    this.#name = name
-    this.#type = type
-    this.#category = category
-    this.#accuracy = accuracy
-    this.#pp = pp
-    this.#power = power
-  }
+  static CATEGORY_SPECIAL = 'special'
+  static CATEGORY_PHYSICAL = 'physical'
+  static CATEGORY_STATUS = 'status'
 
-  get name() {
-    return this.#name;
-  }
-
-  get type() {
-    return this.#type;
-  }
-
-  get category() {
-    return this.#category;
-  }
-
-  get accuracy() {
-    return this.#accuracy;
-  }
-
-  get pp() {
-    return this.#pp;
-  }
-
-  get power() {
-    return this.#power;
-  }
-
-  set pp(value) {
-    this.#pp = value;
+  constructor({name, type, category, power, accuracy, pp, priority, highCriticalHitRatio, effect}){
+    this.name = name
+    this.type = type
+    this.category = category
+    this.accuracy = accuracy
+    this.maxPp = pp
+    this.currentPp = pp
+    this.power = power
+    this.priority = priority
+    this.highCriticalHitRatio = highCriticalHitRatio
+    this.effect = effect
   }
 }

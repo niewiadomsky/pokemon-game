@@ -1,3 +1,7 @@
+$multiplier: 3.5;
+$battle-scene-width: 240px * $multiplier;
+$battle-scene-height: 112px * $multiplier;
+
 $border-color:#27302C;
 
 $battle-text-background: #285069;
@@ -8,3 +12,18 @@ $battle-text-color: #F0F4F9;
 $battle-menu-background: #F8F8F8;
 $battle-menu-border: #6B6685;
 $battle-menu-color: #121613;
+
+$hp-bar-background: #F7F8D9;
+$hp-bar-border: $border-color;
+$hp-bar-width: 300px;
+$hp-bar-border-width: 5px;
+$hp-bar-rounded--bigger: 20px;
+$hp-bar-rounded--smaller: 5px;
+$hp-bar-color: #404040;
+$hp-bar-backface-color: #506860;
+
+$hp-bar-inner-width: 200px;
+$hp-bar-inner-border: #F8F8F8;
+$hp-bar-inner-fill--green: #70F8A8;
+$hp-bar-inner-fill--yellow: #FCDA35;
+$hp-bar-inner-fill--red: #FF6738;

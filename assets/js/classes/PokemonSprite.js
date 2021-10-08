@@ -1,17 +1,31 @@
 export default class PokemonSprite {
-  #front
-  #back
+  front
+  back
+  isShiny
+  num
+  isLoaded = false
 
-  constructor(front, back) {
-    this.#front = front;
-    this.#back = back;
+  constructor(num, isShiny) {
+    this.num = num
+    this.isShiny = isShiny
+    this.setSprites()
   }
 
-  get front() {
-    return this.#front;
+  async setSprites(){
+    try {
+      this.front = (await this.importSprite('front')).default
+      this.back = (await this.importSprite('back')).default
+      this.isLoaded = true
+    } catch (e) {
+      console.log('Not found sprites', e)
+    }
   }
 
-  get back() {
-    return this.#back;
+  importSprite(sidePath){
+    const {num, isShiny} = this
+    const shinyPath = isShiny ? 'shiny/' : ''
+
+    return import('./../../sprites/' + sidePath + '/' + shinyPath + num + '.png')
   }
+
 }

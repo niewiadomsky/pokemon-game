@@ -1,71 +1,83 @@
+import PokemonSprite from "./PokemonSprite";
+
 export default class Pokemon {
-  #name
-  #level
-  #maxHp
-  #currentHp
-  #moves = []
-  #sprite
-  #experience = 0
-  #type
-  #gender
+  species
+  name
+  level
+  currentHp
+  moves
+  gender
+  types
+  stats = {
+    hp: null,
+    atk: null,
+    def: null,
+    spa: null,
+    spd: null,
+    spe: null,
+  }
+  isShiny = false
+  sprite
+  experience = 0
+  isLoaded = false
 
-  //Todo abilities
-  //Todo stats
+  static GENDER_MALE = 'male'
+  static GENDER_FEMALE = 'female'
+  static GENDER_GENDERLESS = 'genderless'
 
-  constructor(name, type, level, maxHp, moves, sprite, gender){
-    this.#name = name
-    this.#level = name
-    this.#type = type
-    this.#maxHp = maxHp
-    this.#currentHp = maxHp
-    this.#moves = moves
-    this.#sprite = sprite
-    this.#gender = gender
-
+  constructor(species, level, gender, moves, name = null){
+    this.species = species
+    this.name = name ? name : species.name
+    this.level = level
+    this.moves = moves
+    this.gender = gender
+    this.prepareToBattle()
   }
 
-
-  get currentHp() {
-    return this.#currentHp;
+  calcMaxHp(base, level){
+    return Math.floor(0.01 * 2 * base * level) + level + 10
   }
 
-  get experience() {
-    return this.#experience;
+  calcStat(base, level){
+    return Math.floor(0.01 * 2 * base * level) + 5
   }
 
-  get name() {
-    return this.#name;
+  calcStats(){
+    const level = this.level
+    const baseStats = this.species.baseStats
+    const stats = this.stats
+
+    Object.keys(baseStats).forEach(stat =>
+        stats[stat] = stat === 'hp' ?
+          this.calcMaxHp(baseStats[stat], level) :
+          this.calcStat(baseStats[stat], level)
+      )
   }
 
-  get type() {
-    return this.#type;
+  async setTypes(){
+    const typeNames = this.species.types
+
+    this.types = await typeNames.map(async typeName => {
+        const Type = (await import(`./Types/${typeName}Type`)).default
+        return await new Type()
+      })
   }
 
-  get level() {
-    return this.#level;
+  async setSprites(){
+    const num = this.species.num
+    const isShiny = this.isShiny
+
+    this.sprite = await new PokemonSprite(num, isShiny)
   }
 
-  get maxHp() {
-    return this.#maxHp;
+  async prepareToBattle(){
+    this.calcStats()
+    this.currentHp = this.stats.hp
+    await this.setTypes()
+    await this.setSprites()
+    this.isLoaded = true
+
+    console.log(this)
   }
 
-  get moves() {
-    return this.#moves;
-  }
-
-  get gender() {
-    return this.#gender;
-  }
-
-  get sprite() {
-    return this.#sprite;
-  }
-
-  set currentHp(value) {
-    this.#currentHp = value;
-  }
-
-  set experience(value) {
-    this.#experience = value;
-  }
 }
