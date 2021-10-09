@@ -2,7 +2,7 @@
   <div>
     <div class="battle-scene">
       <div v-if="opponent && opponent.isLoaded && myPokemon && myPokemon.isLoaded" class="battle-container">
-        <HpBar class="hp-bar hp-bar--player" :pokemon="myPokemon"></HpBar>
+        <HpBar class="hp-bar hp-bar--player" :showExperience="true" :showIndicator="true" :pokemon="myPokemon"></HpBar>
         <img class="pokemon-sprite pokemon-sprite--player" :src="myPokemon.sprite.back" :alt="myPokemon.name">
 
         <HpBar class="hp-bar hp-bar--opponent" :pokemon="opponent"></HpBar>
@@ -63,7 +63,7 @@ export default {
         @apply absolute z-10;
 
         &--player {
-          bottom: 10px;
+          bottom: 20px;
           right: 30px;
         }
 
