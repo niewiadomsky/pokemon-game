@@ -81,9 +81,6 @@ export default {
 
       return true
     },
-    emitMessage(msg){
-      this.$emit('message', msg)
-    },
     setMenuOptionsInController(){
       const options = this.options.map(option => {
         const callbackName = `choice${capitalize(option)}`
@@ -127,7 +124,7 @@ export default {
     selectedMove(){
       if(this.$controller.category !== 'moves')
         return false
-      console.log(this.$controller.currentOption.option)
+
       return this.$controller.currentOption.option
     }
   },

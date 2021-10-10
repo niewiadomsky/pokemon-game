@@ -20,7 +20,7 @@ export default class Pokemon {
   sprite
   experience = 0
   isLoaded = false
-
+  experienceMode = 'fast'
   static GENDER_MALE = 'male'
   static GENDER_FEMALE = 'female'
   static GENDER_GENDERLESS = 'genderless'
@@ -65,6 +65,21 @@ export default class Pokemon {
     return this.isDead
   }
 
+  getTotalExperienceToNextLevel(){
+    const nextLevel = this.level + 1
+    const {experienceMode} = this
+
+    const modes = {
+      fast: n => (Math.pow(n, 3) * 4) / 5,
+      mediumFast: n => Math.pow(n, 3),
+      mediumSlow: n => (6/5) * Math.pow(n, 3) - 15 * n * n + 100 * n - 140,
+      slow: n => 5 * (Math.pow(n, 3)) / 5,
+    }
+
+    return experienceMode in modes ? modes[this.experienceMode](nextLevel) : null
+  }
+
+
   async setTypes(){
     const typeNames = this.species.types
 
@@ -95,5 +110,9 @@ export default class Pokemon {
 
   get isDead(){
     return this.currentHp <= 0
+  }
+
+  get totalExperienceToNextLevel(){
+    return this.getTotalExperienceToNextLevel()
   }
 }
