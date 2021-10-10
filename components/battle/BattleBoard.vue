@@ -9,7 +9,7 @@
         <img class="pokemon-sprite pokemon-sprite--opponent" :src="opponent.sprite.front" :alt="opponent.name">
       </div>
     </div>
-    <div class="battle-bottom">
+    <div class="battle-bottom" v-if="myPokemon && myPokemon.isLoaded">
       <BattleText></BattleText>
       <BattleMenu :pokemon="myPokemon"></BattleMenu>
     </div>
@@ -24,11 +24,11 @@ export default {
     opponent: null,
   }),
   async mounted() {
-    const myMoves = this.$pkm.createMoves(['flamethrower', 'leer', 'scratch'])
-    const opponentMoves = this.$pkm.createMoves(['body slam', 'rest', 'tackle', 'petal dance'])
+    const opponentMoves = this.$pkm.createMoves(['flamethrower', 'scratch'])
+    const myMoves = this.$pkm.createMoves(['body slam', 'rest', 'tackle', 'petal dance'])
 
-    this.myPokemon = await this.$pkm.createPokemon('charizard', 20, 'male', myMoves)
-    this.opponent = await this.$pkm.createPokemon('snorlax', 15, 'female', opponentMoves)
+    this.opponent = await this.$pkm.createPokemon('charizard', 20, 'male', opponentMoves)
+    this.myPokemon = await this.$pkm.createPokemon('snorlax', 15, 'female', myMoves)
   }
 
 }

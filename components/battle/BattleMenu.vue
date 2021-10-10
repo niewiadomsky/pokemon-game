@@ -1,14 +1,17 @@
 <template>
   <div v-if="!isDisabled" class="battle-menu__wrapper">
     <div v-if="selectingMove" class="battle-menu battle-menu--fight">
-      <div class="battle-menu__option" v-for="option in pokemon.moves" :key="option.name" @click="functionHandler(`choice${option}`)">
-        <button class="battle-menu__option-text">{{option.name}}</button>
+      <div class="battle-menu__option" v-for="option in pokemon.moves" :key="option.name">
+        <button class="battle-menu__option-text" :ref="option.name">{{option.name}}</button>
+      </div>
+      <div class="battle-menu__option" v-for="missingMove in missingMoves">
+        <button class="battle-menu__option-text">{{missingMove}}</button>
       </div>
     </div>
     <div class="battle-menu">
       <template v-if="!selectingMove">
-        <div class="battle-menu__option" v-for="option in options" :key="option" @click="functionHandler(`choice${option}`)">
-          <button class="battle-menu__option-text">{{option}}</button>
+        <div class="battle-menu__option" v-for="option in options" :key="option">
+          <button class="battle-menu__option-text" :ref="option">{{option}}</button>
         </div>
       </template>
     </div>
@@ -16,6 +19,8 @@
 </template>
 
 <script>
+import {capitalize} from "../../Utils/helpers";
+
 export default {
   props: {
     pokemon: {
@@ -28,13 +33,18 @@ export default {
     }
   },
   data: () => ({
-    options: ['Fight', 'Pokemon', 'Bag', 'Run'],
+    options: ['fight', 'bag', 'pokemon', 'run'],
     selectingMove: false,
   }),
   methods: {
     choiceFight(){
-      console.log('fight')
       this.selectingMove = true
+      this.$nextTick(() => this.setMovesOptionsInController())
+    },
+    revertChoiceFight(){
+      this.selectingMove = false
+      this.$nextTick(() => this.setMenuOptionsInController())
+
     },
     choicePokemon(){
       console.log('pokemon')
@@ -51,10 +61,48 @@ export default {
 
       return true
     },
-    functionHandler(functionName){
-      this[functionName]();
+    setMenuOptionsInController(){
+      const options = this.options.map(option => {
+        const callbackName = `choice${capitalize(option)}`
+        const revertCallbackName = `revertChoice${capitalize(option)}`
+
+        const callback = this[callbackName] ? this[callbackName].bind(this) : null
+        const revertCallback = this[revertCallbackName] ? this[revertCallbackName].bind(this) : null
+        const ref = this.$refs[option][0]
+
+        return {callback, revertCallback, ref}
+      })
+
+      this.$controller.setOptions(options)
+
+    },
+    setMovesOptionsInController(){
+      const options = this.pokemon.moves.map(option => {
+        const callback = () => console.log(option)
+        const revertCallback = this.revertChoiceFight
+        const ref = this.$refs[option.name][0]
+
+        return {callback, revertCallback, ref}
+
+      })
+
+      this.$controller.setOptions(options)
+
     }
-  }
+  },
+  computed: {
+    missingMoves(){
+      const length = this.pokemon.moves.length
+      if(length >= 4)
+        return []
+      const missingCount = 4 - length
+
+      return new Array(missingCount).fill('-')
+    }
+  },
+  mounted() {
+    this.setMenuOptionsInController()
+  },
 }
 </script>
 
@@ -72,7 +120,7 @@ export default {
     color: $battle-menu-color;
 
     &__option {
-      @apply w-1/2 cursor-pointer flex items-center;
+      @apply w-1/2 cursor-default flex items-center;
 
       &:nth-child(odd) {
         @apply pl-4;
@@ -90,7 +138,7 @@ export default {
           border-bottom: 12px solid transparent;
         }
 
-        &:hover, &:focus{
+        &:focus{
           @apply outline-none;
 
           &::before {
