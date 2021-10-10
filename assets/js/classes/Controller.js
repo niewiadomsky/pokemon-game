@@ -28,14 +28,13 @@ export default class Controller {
   }
 
   onKeyDown({key, altKey, ctrlKey, shiftKey}){
-    console.log(key, altKey, ctrlKey, shiftKey)
+    if(this.isDisabled) return
+
     const assignedKey = this.keyMap.find(assignedKey => assignedKey.key === key)
 
     if(!assignedKey) {
       return console.log('Not found key: ', key)
     }
-
-    console.log(assignedKey)
 
     const methodName = assignedKey.callback ? assignedKey.callback : assignedKey.action
 
@@ -140,6 +139,10 @@ export default class Controller {
 
   get category(){
     return this.$store.getters['controller/getCategory']
+  }
+
+  get isDisabled(){
+    return this.$store.getters['battleText/isTyping']
   }
 
 }

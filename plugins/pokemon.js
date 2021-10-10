@@ -9,12 +9,25 @@ const pokemonApi = {
   getPokemonInfo(name){
     return this.pokemonJson[name]
   },
+  getPokemonInfoByNum(num){
+    return Object.values(this.pokemonJson).find(pokemon => pokemon.num === num)
+  },
   createPokemon(species, level, gender, moves, name = null){
     try{
       return new Pokemon(this.getPokemonInfo(species), level, gender, moves, name)
     } catch (e) {
       console.log(`Not found pokemon: ${name}`)
     }
+  },
+  createRandomPokemon(minLevel = 15, maxLevel = 25) {
+    const level = Math.floor(Math.random() * (maxLevel - minLevel) + minLevel)
+    const maxNum = 151
+    const num = Math.floor(Math.random() * (maxNum - 1) + 1)
+    const species = this.getPokemonInfoByNum(num).alias
+    const moves = this.createRandomMoves()
+    const gender = Math.random() <= 0.5 ? 'male' : 'female'
+
+    return this.createPokemon(species, level, gender, moves)
   },
   getMoveInfo(name) {
     return this.movesJson.find(move => move.name.toLowerCase() === name.toLowerCase())
@@ -37,6 +50,11 @@ const pokemonApi = {
   },
   createMoves(moves){
     return moves.map(move => this.createMove(move))
+  },
+  createRandomMoves(){
+    const moves = this.movesJson.sort(() => Math.random() - Math.random()).slice(0, 4)
+
+    return moves.map(move => this.createMove(move.name))
   }
 }
 

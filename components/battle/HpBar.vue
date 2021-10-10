@@ -156,6 +156,8 @@ export default {
         &--fill {
           @apply h-full rounded-2xl;
 
+          transition: width .4s ease-out;
+
           &.high {
             background: $hp-bar-inner-fill--green;
           }
@@ -188,6 +190,7 @@ export default {
 
           &--fill {
             @apply h-full;
+            transition: width .4s ease-out;
             background: $hp-bar-experience-color--fill;
           }
         }

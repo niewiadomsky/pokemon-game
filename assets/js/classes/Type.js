@@ -10,4 +10,12 @@ export default class Type{
     this.icon = icon
     this.effectiveness = effectiveness
   }
+
+  //Todo fix effectiveness multipliers
+  getMultiplierOfType(type) {
+    const { effectiveness } = this
+    const multiplier = type in effectiveness ? effectiveness[type] : 1
+
+    return 1 / multiplier
+  }
 }

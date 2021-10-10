@@ -31,7 +31,7 @@ export default class Pokemon {
     this.level = level
     this.moves = moves
     this.gender = gender
-    this.prepareToBattle()
+    return this.prepareToBattle()
   }
 
   calcMaxHp(base, level){
@@ -54,13 +54,26 @@ export default class Pokemon {
       )
   }
 
+  takeDamage(damage){
+    const remainingHp = this.currentHp - damage
+
+    if(remainingHp <= 0)
+      this.currentHp = 0
+    else
+      this.currentHp = remainingHp
+
+    return this.isDead
+  }
+
   async setTypes(){
     const typeNames = this.species.types
 
-    this.types = await typeNames.map(async typeName => {
-        const Type = (await import(`./Types/${typeName}Type`)).default
-        return await new Type()
+    const types = await typeNames.map(async typeName => {
+        const {default: Type} = await import(`./Types/${typeName}Type`)
+        return new Type
       })
+
+    this.types = await Promise.all(types)
   }
 
   async setSprites(){
@@ -77,7 +90,10 @@ export default class Pokemon {
     await this.setSprites()
     this.isLoaded = true
 
-    console.log(this)
+    return this
   }
 
+  get isDead(){
+    return this.currentHp <= 0
+  }
 }

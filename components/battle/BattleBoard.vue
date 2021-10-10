@@ -10,25 +10,34 @@
       </div>
     </div>
     <div class="battle-bottom" v-if="myPokemon && myPokemon.isLoaded">
-      <BattleText></BattleText>
-      <BattleMenu :pokemon="myPokemon"></BattleMenu>
+      <BattleText ref="battleText"></BattleText>
+      <BattleMenu :pokemon="myPokemon" @message="onMenuMessage"></BattleMenu>
     </div>
   </div>
 </template>
 
 <script>
-
 export default {
   data: () => ({
     myPokemon: null,
-    opponent: null,
   }),
   async mounted() {
-    const opponentMoves = this.$pkm.createMoves(['flamethrower', 'scratch'])
-    const myMoves = this.$pkm.createMoves(['dragon rage', 'fly', 'wing attack', 'tackle'])
+    const myMoves = this.$pkm.createMoves(['flamethrower', 'fly', 'rock slide', 'surf'])
+    this.myPokemon = await this.$pkm.createPokemon('dragonite', 30, 'female', myMoves)
 
-    this.opponent = await this.$pkm.createPokemon('charizard', 20, 'male', opponentMoves)
-    this.myPokemon = await this.$pkm.createPokemon('dragonite', 15, 'female', myMoves)
+    const opponent = await this.$pkm.createRandomPokemon(15, 25)
+
+    this.$battle.startBattle(this.myPokemon, opponent)
+  },
+  methods: {
+    onMenuMessage(message){
+      this.$refs.battleText.setText(message)
+    }
+  },
+  computed: {
+    opponent(){
+      return this.$battle.opponent
+    }
   }
 
 }

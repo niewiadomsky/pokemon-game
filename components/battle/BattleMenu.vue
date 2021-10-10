@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isDisabled" class="battle-menu__wrapper">
+  <div v-if="!isDisabled" v-show="!isTyping" class="battle-menu__wrapper">
     <div v-if="selectingMove" class="battle-menu battle-menu--fight">
       <div class="battle-menu__option" v-for="option in pokemon.moves" :key="option.name">
         <button class="battle-menu__option-text" :ref="option.name">{{option.name}}</button>
@@ -29,7 +29,8 @@
 </template>
 
 <script>
-import {capitalize} from "../../Utils/helpers";
+import {capitalize} from "../../Utils/helpers"
+import {mapGetters} from 'vuex'
 
 export default {
   props: {
@@ -45,6 +46,7 @@ export default {
   data: () => ({
     options: ['fight', 'bag', 'pokemon', 'run'],
     selectingMove: false,
+    opponentIsDead: false,
   }),
   methods: {
     capitalize,
@@ -58,7 +60,11 @@ export default {
 
     },
     useMove(move){
-      console.log(move)
+      this.$battle.nextRound(async() => {
+        this.opponentIsDead = this.$battle.useMove(move, true)
+
+        this.revertChoiceFight()
+      })
     },
     choicePokemon(){
       console.log('pokemon')
@@ -74,6 +80,9 @@ export default {
       console.log('run')
 
       return true
+    },
+    emitMessage(msg){
+      this.$emit('message', msg)
     },
     setMenuOptionsInController(){
       const options = this.options.map(option => {
@@ -95,7 +104,7 @@ export default {
         const callback = this.useMove.bind(this, option)
         const ref = this.$refs[option.name][0]
 
-        return {option, ref}
+        return {option, callback, ref}
 
       })
 
@@ -104,6 +113,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      'isTyping': 'battleText/isTyping'
+    }),
     missingMoves(){
       const length = this.pokemon.moves.length
       if(length >= 4)
@@ -122,6 +134,14 @@ export default {
   mounted() {
     this.setMenuOptionsInController()
   },
+  watch: {
+    isTyping(){
+      if(!this.isTyping && this.opponentIsDead) {
+        this.$battle.endBattle(true)
+        this.opponentIsDead = false
+      }
+    }
+  }
 }
 </script>
 
