@@ -14,6 +14,16 @@
           <button class="battle-menu__option-text" :ref="option">{{option}}</button>
         </div>
       </template>
+      <div v-if="selectedMove">
+        <div class="move-pp">
+          <span class="move-pp__label">PP</span>
+          <span class="move-pp__value">{{selectedMove.currentPp}}/{{selectedMove.maxPp}}</span>
+        </div>
+        <div class="move-type">
+          <span class="move-type__label">Typ/</span>
+          <span class="move-type__value">{{capitalize(selectedMove.type)}}</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -37,6 +47,7 @@ export default {
     selectingMove: false,
   }),
   methods: {
+    capitalize,
     choiceFight(){
       this.selectingMove = true
       this.$nextTick(() => this.setMovesOptionsInController())
@@ -73,10 +84,10 @@ export default {
         const revertCallback = this[revertCallbackName] ? this[revertCallbackName].bind(this) : null
         const ref = this.$refs[option][0]
 
-        return {callback, revertCallback, ref}
+        return {option, callback, revertCallback, ref}
       })
 
-      this.$controller.setOptions(options)
+      this.$controller.setOptions(options, 'menu')
 
     },
     setMovesOptionsInController(){
@@ -84,11 +95,11 @@ export default {
         const callback = this.useMove.bind(this, option)
         const ref = this.$refs[option.name][0]
 
-        return {ref}
+        return {option, ref}
 
       })
 
-      this.$controller.setOptions(options)
+      this.$controller.setOptions(options, 'moves')
 
     }
   },
@@ -100,6 +111,12 @@ export default {
       const missingCount = 4 - length
 
       return new Array(missingCount).fill('-')
+    },
+    selectedMove(){
+      if(this.$controller.category !== 'moves')
+        return false
+      console.log(this.$controller.currentOption.option)
+      return this.$controller.currentOption.option
     }
   },
   mounted() {
@@ -140,7 +157,7 @@ export default {
           border-bottom: 12px solid transparent;
         }
 
-        &:focus{
+        &:focus {
           @apply outline-none;
 
           &::before {
@@ -149,9 +166,25 @@ export default {
         }
       }
     }
-    &--fight{
+    &--fight {
       @apply mr-1;
       width: $battle-scene-width - 300px - 8px;
+    }
+
+    .move-pp, .move-type {
+      @apply flex justify-between items-stretch py-1 uppercase;
+      width: 270px;
+      &__label {
+        @apply text-3xl;
+      }
+
+      &__value {
+        @apply text-4xl;
+      }
+    }
+
+    .move-type {
+      @apply text-gray-600;
     }
   }
 </style>

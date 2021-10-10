@@ -97,8 +97,9 @@ export default class Controller {
     return this.options.length ? this.options.length - 1 : null
   }
 
-  setOptions(options) {
+  setOptions(options, category) {
     this.$store.commit('controller/SET_OPTIONS', options)
+    this.$store.commit('controller/SET_CATEGORY', category)
     this.selectOption(0, false)
   }
 
@@ -135,6 +136,10 @@ export default class Controller {
 
   get executedOption(){
     return this.$store.getters['controller/getExecutedOption']
+  }
+
+  get category(){
+    return this.$store.getters['controller/getCategory']
   }
 
 }
