@@ -11,11 +11,12 @@ export default class Controller {
     { action: 'right', key: 'ArrowRight' },
     { action: 'menu', key: 'enter' },
   ]
+  rowLength = 2
 
   constructor($store) {
     this.$store = $store
-    this.collideEffect = new Audio(collideSound)
-    this.selectEffect = new Audio(selectSound)
+    this.selectSound = new Audio(selectSound)
+    this.collideSound = new Audio(collideSound)
 
     window.addEventListener('keydown', this.onKeyDown.bind(this))
 
@@ -43,42 +44,52 @@ export default class Controller {
   }
 
   executeOption(){
-    if(this.currentOption.callback)
+    if(this.currentOption.callback) {
       this.currentOption.callback()
+      this.$store.commit('controller/SET_EXECUTED_OPTION', this.currentOption)
+      this.playSelectSound()
+    }
   }
 
   revertExecutionOption(){
-    if(this.currentOption.revertCallback)
-      this.currentOption.revertCallback()
+    if(this.executedOption && this.executedOption.revertCallback) {
+      this.executedOption.revertCallback()
+      this.resetExecutedOption()
+      this.playSelectSound()
+    }
   }
 
   left() {
-    try {
-      const currentIndex = this.getCurrentIndex()
-      let newIndex;
-      newIndex = currentIndex - 1
-
-      this.selectOption(newIndex)
-    } catch(e) {
-      this.collideEffect.play()
-
-    }
-
+    this.move((currentIndex) => {
+      const index = currentIndex - 1
+      return index % this.rowLength === 0 ? index : -1
+    })
   }
-  right(){
+  right() {
+    this.move((currentIndex) => {
+      const index = currentIndex + 1
+      return index % this.rowLength !== 0 ? index : -1
+    })
+  }
+  up() {
+    this.move((currentIndex) => currentIndex - 2)
+  }
+  down() {
+    this.move((currentIndex) => currentIndex + 2)
+  }
+
+  move(callback){
     try{
       const currentIndex = this.getCurrentIndex()
-      const newIndex = currentIndex + 1
+      const newIndex = callback(currentIndex)
 
       this.selectOption(newIndex)
     } catch(e){
-      this.collideEffect.play()
+      this.playCollideSound()
     }
-
   }
 
   getCurrentIndex(){
-    console.log(this.currentOption)
     return this.options.findIndex(option => option.ref === this.currentOption.ref)
   }
 
@@ -88,18 +99,30 @@ export default class Controller {
 
   setOptions(options) {
     this.$store.commit('controller/SET_OPTIONS', options)
-    console.log(options)
     this.selectOption(0, false)
   }
 
   selectOption(index, sound = true){
     const option = this.options[index]
-    console.log(option, this.options)
     option.ref.focus()
     this.$store.commit('controller/SET_CURRENT_OPTION', option)
 
     if(sound)
-      this.selectEffect.play()
+      this.playSelectSound()
+  }
+
+  playSelectSound(){
+    this.selectSound.currentTime = 0
+    this.selectSound.play()
+  }
+
+  playCollideSound(){
+    this.collideSound.currentTime = 0
+    this.collideSound.play()
+  }
+
+  resetExecutedOption(){
+    this.$store.commit('controller/SET_EXECUTED_OPTION', null)
   }
 
   get options(){
@@ -108,6 +131,10 @@ export default class Controller {
 
   get currentOption(){
     return this.$store.getters['controller/getCurrentOption']
+  }
+
+  get executedOption(){
+    return this.$store.getters['controller/getExecutedOption']
   }
 
 }

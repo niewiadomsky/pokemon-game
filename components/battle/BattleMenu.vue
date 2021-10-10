@@ -46,6 +46,9 @@ export default {
       this.$nextTick(() => this.setMenuOptionsInController())
 
     },
+    useMove(move){
+      console.log(move)
+    },
     choicePokemon(){
       console.log('pokemon')
 
@@ -78,11 +81,10 @@ export default {
     },
     setMovesOptionsInController(){
       const options = this.pokemon.moves.map(option => {
-        const callback = () => console.log(option)
-        const revertCallback = this.revertChoiceFight
+        const callback = this.useMove.bind(this, option)
         const ref = this.$refs[option.name][0]
 
-        return {callback, revertCallback, ref}
+        return {ref}
 
       })
 
@@ -120,10 +122,10 @@ export default {
     color: $battle-menu-color;
 
     &__option {
-      @apply w-1/2 cursor-default flex items-center;
+      @apply w-1/2 pl-4 cursor-default flex items-center;
 
       &:nth-child(odd) {
-        @apply pl-4;
+        @apply pl-5;
       }
 
       &-text {

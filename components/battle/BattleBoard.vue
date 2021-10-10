@@ -25,10 +25,10 @@ export default {
   }),
   async mounted() {
     const opponentMoves = this.$pkm.createMoves(['flamethrower', 'scratch'])
-    const myMoves = this.$pkm.createMoves(['body slam', 'rest', 'tackle', 'petal dance'])
+    const myMoves = this.$pkm.createMoves(['dragon rage', 'fly', 'wing attack', 'tackle'])
 
     this.opponent = await this.$pkm.createPokemon('charizard', 20, 'male', opponentMoves)
-    this.myPokemon = await this.$pkm.createPokemon('snorlax', 15, 'female', myMoves)
+    this.myPokemon = await this.$pkm.createPokemon('dragonite', 15, 'female', myMoves)
   }
 
 }

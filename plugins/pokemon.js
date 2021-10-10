@@ -10,7 +10,11 @@ const pokemonApi = {
     return this.pokemonJson[name]
   },
   createPokemon(species, level, gender, moves, name = null){
-    return new Pokemon(this.getPokemonInfo(species), level, gender, moves, name)
+    try{
+      return new Pokemon(this.getPokemonInfo(species), level, gender, moves, name)
+    } catch (e) {
+      console.log(`Not found pokemon: ${name}`)
+    }
   },
   getMoveInfo(name) {
     return this.movesJson.find(move => move.name.toLowerCase() === name.toLowerCase())
@@ -25,7 +29,11 @@ const pokemonApi = {
     return this.movesJson.filter(moveJson => moves.some(move => move.toLowerCase() === moveJson.name.toLowerCase()))
   },
   createMove(moveName) {
-    return new Move(this.getMoveInfo(moveName))
+    try {
+      return new Move(this.getMoveInfo(moveName))
+    } catch(e) {
+      console.log(`Not found move: ${moveName}`)
+    }
   },
   createMoves(moves){
     return moves.map(move => this.createMove(move))
