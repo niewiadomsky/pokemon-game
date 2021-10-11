@@ -3,22 +3,26 @@ import selectSound from 'pokemon-assets/assets/audio/sfx/select.wav'
 
 export default class Controller {
   keyMap = [
-    { action: 'select', key: 'z', callback: 'executeOption' },
-    { action: 'back', key: 'x', callback: 'revertExecutionOption'},
+    { action: 'select', key: 'z', onKeyDown: 'executeOption' },
+    { action: 'back', key: 'x', onKeyDown: 'revertExecutionOption'},
     { action: 'up', key: 'ArrowUp' },
     { action: 'down', key: 'ArrowDown' },
     { action: 'left', key: 'ArrowLeft' },
     { action: 'right', key: 'ArrowRight' },
     { action: 'menu', key: 'enter' },
+    { action: 'accelerate', key: ' ', onKeyDown: 'startAccelerate', onKeyUp: 'stopAccelerate', ignoreDisabled: true },
   ]
   rowLength = 2
+  isAccelerating = false
 
-  constructor($store) {
+  constructor($store, $text) {
     this.$store = $store
+    this.$text = $text
     this.selectSound = new Audio(selectSound)
     this.collideSound = new Audio(collideSound)
 
-    window.addEventListener('keydown', this.onKeyDown.bind(this))
+    window.addEventListener('keydown', this.onKeyPress.bind(this))
+    window.addEventListener('keyup', this.onKeyPress.bind(this))
 
     //Prevent blur
     window.addEventListener('mousedown', (e) => {
@@ -27,18 +31,24 @@ export default class Controller {
     })
   }
 
-  onKeyDown({key, altKey, ctrlKey, shiftKey}){
-    if(this.isDisabled) return
-
+  onKeyPress({key, altKey, ctrlKey, shiftKey, type}){
     const assignedKey = this.keyMap.find(assignedKey => assignedKey.key === key)
+
+    if(this.isDisabled && !assignedKey.ignoreDisabled)
+      return
 
     if(!assignedKey) {
       return console.log('Not found key: ', key)
     }
 
-    const methodName = assignedKey.callback ? assignedKey.callback : assignedKey.action
+    let methodName;
+    if(type === 'keydown')
+      methodName = 'onKeyDown' in assignedKey ? assignedKey.onKeyDown : assignedKey.action
 
-    if(this[methodName])
+    if(type === 'keyup')
+      methodName = 'onKeyUp' in assignedKey ? assignedKey.onKeyUp : null
+
+    if(methodName in this)
       this[methodName]()
   }
 
@@ -75,6 +85,19 @@ export default class Controller {
   }
   down() {
     this.move((currentIndex) => currentIndex + 2)
+  }
+
+  startAccelerate(){
+    if(this.isAccelerating)
+      return
+
+    this.$text.multiplier = 3
+    this.isAccelerating = true
+  }
+
+  stopAccelerate(){
+    this.$text.multiplier = 1
+    this.isAccelerating = false
   }
 
   move(callback){
@@ -142,7 +165,7 @@ export default class Controller {
   }
 
   get isDisabled(){
-    return this.$store.getters['battleText/isTyping']
+    return this.$text.isTyping
   }
 
 }

@@ -5,10 +5,12 @@ export default class Battle {
   isFighting = false
   $store
   $pkm
+  $text
 
-  constructor($store, $pkm) {
+  constructor($store, $pkm, $text) {
     this.$store = $store
     this.$pkm = $pkm
+    this.$text = $text
   }
 
   startBattle(player, ai) {
@@ -16,7 +18,7 @@ export default class Battle {
     this.player = player
     this.ai = ai
     this.isFighting = true
-    console.log('Battle start')
+    this.$text.setDefault()
   }
 
   nextRound(callback) {
@@ -26,25 +28,23 @@ export default class Battle {
     this.round++
   }
 
-  useMove(move, isPlayer) {
+  async useMove(move, isPlayer) {
     const {ai, player,} = this
-    let messages = []
     const attacker = isPlayer ? player : ai
     const defender = isPlayer ? ai: player
 
     const {damage, effectivenessMessage} = this.calcDamage(move, attacker, defender)
 
     const isDead = defender.takeDamage(damage)
-    messages.push(`${!isPlayer ? 'Wild ' : ''}${attacker.name.toUpperCase()} used ${move.name.toUpperCase()}!`)
+    await this.$text.setText(`${!isPlayer ? 'Wild ' : ''}${attacker.name.toUpperCase()} used ${move.name.toUpperCase()}!`)
 
     if(effectivenessMessage)
-      messages.push(effectivenessMessage)
+      await this.$text.setText(effectivenessMessage)
 
     if(isDead) {
-      messages.push(`${!isPlayer ? 'Wild ' : ''}${defender.name.toUpperCase()} fainted!`)
+      await this.$text.setText(`${!isPlayer ? 'Wild ' : ''}${defender.name.toUpperCase()} fainted!`)
     }
-
-    this.setMessages(messages)
+    await this.endBattle(true)
     return isDead
   }
 
@@ -118,10 +118,6 @@ export default class Battle {
     }
 
     return multiplier in messages ? messages[multiplier] : null
-  }
-
-  setMessages(messages){
-    this.$store.commit('battleText/SET_MESSAGES', messages)
   }
 
   get opponent(){

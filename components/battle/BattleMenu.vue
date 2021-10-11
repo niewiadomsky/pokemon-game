@@ -29,8 +29,7 @@
 </template>
 
 <script>
-import {capitalize} from "../../Utils/helpers"
-import {mapGetters} from 'vuex'
+import {capitalize} from "../../utils/helpers"
 
 export default {
   props: {
@@ -61,9 +60,9 @@ export default {
     },
     useMove(move){
       this.$battle.nextRound(async() => {
-        this.opponentIsDead = this.$battle.useMove(move, true)
-
         this.revertChoiceFight()
+        this.opponentIsDead = await this.$battle.useMove(move, true)
+        this.$controller.selectOption(0)
       })
     },
     choicePokemon(){
@@ -110,9 +109,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({
-      'isTyping': 'battleText/isTyping'
-    }),
     missingMoves(){
       const length = this.pokemon.moves.length
       if(length >= 4)
@@ -126,18 +122,13 @@ export default {
         return false
 
       return this.$controller.currentOption.option
+    },
+    isTyping(){
+      return this.$text.isTyping
     }
   },
   mounted() {
     this.setMenuOptionsInController()
-  },
-  watch: {
-    isTyping(){
-      if(!this.isTyping && this.opponentIsDead) {
-        this.$battle.endBattle(true)
-        this.opponentIsDead = false
-      }
-    }
   }
 }
 </script>
