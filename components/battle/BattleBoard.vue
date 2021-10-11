@@ -22,10 +22,10 @@ export default {
     myPokemon: null,
   }),
   async mounted() {
-    const myMoves = this.$pkm.createMoves(['quick attack', 'rock slide', 'counter', 'surf'])
+    const myMoves = this.$pkm.createMoves(['flamethrower', 'petal dance', 'fly', 'surf'])
     this.myPokemon = await this.$pkm.createPokemon('dragonite', 35, 'female', myMoves)
 
-    const opponent = await this.$pkm.createRandomPokemon(15, 25)
+    const opponent = await this.$pkm.createRandomPokemon(30, 40)
 
     this.$battle.startBattle(this.myPokemon, opponent)
   },

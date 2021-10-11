@@ -95,13 +95,14 @@ export default class Battle {
     this.isFighting = false
     const isPlayerPokemon = this.isPlayerPokemon(winner)
 
-    await this.$text.setText(`${isPlayerPokemon ? 'Wild ' : ''}${winner.name} is the Winner!`)
+    // await this.$text.setText(`${isPlayerPokemon ? 'Wild ' : ''}${winner.name} is the Winner!`)
 
     if(isPlayerPokemon) {
       const experience = this.calcExperience(loser)
-      await this.$text.setText(`${winner.name} gain ${experience} exp.!`)
+      await this.$text.setText(`${winner.name} gain ${experience} exp!`)
       winner.gainExperience(experience)
-      const ai  = await this.$pkm.createRandomPokemon(15, 25)
+
+      const ai  = await this.$pkm.createRandomPokemon(30, 40)
       this.startBattle(this.player, ai)
 
     } else {
@@ -173,8 +174,9 @@ export default class Battle {
     const participatedPokemons = 1
     const isTrainerMultiplier = 1
     const baseExp = calcRandomExp(evoRanges[evoGrade - 1])
+    const multiplier = 3
 
-    return Math.ceil((level * isTrainerMultiplier * baseExp) / (7 * participatedPokemons))
+    return Math.ceil((level * isTrainerMultiplier * baseExp) / (7 * participatedPokemons)) * multiplier
   }
 
   getMessageByTypeEffectiveness(multiplier) {
