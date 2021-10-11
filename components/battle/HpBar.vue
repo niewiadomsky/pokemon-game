@@ -65,7 +65,7 @@ export default {
       return percent < 0 ? 0 : percent
     },
     expPercent(){
-      return 99
+      return this.pokemon.experiencePercent
     },
     barClass(){
       if(this.hpPercent < 20)

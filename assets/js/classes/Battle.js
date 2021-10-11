@@ -41,12 +41,12 @@ export default class Battle {
     let isDead = await this.useMove(move, attacker, defender)
 
     if(isDead)
-      return this.endBattle(attacker)
+      return this.endBattle(attacker, defender)
 
     isDead = await this.useMove(secondMove, defender, attacker)
 
     if(isDead)
-      return this.endBattle(defender)
+      return this.endBattle(defender, attacker)
 
     return false
   }
@@ -91,15 +91,19 @@ export default class Battle {
     return this.ai.moves.sort(() => Math.random() - Math.random())[0]
   }
 
-  async endBattle(winner){
+  async endBattle(winner, loser){
     this.isFighting = false
     const isPlayerPokemon = this.isPlayerPokemon(winner)
 
     await this.$text.setText(`${isPlayerPokemon ? 'Wild ' : ''}${winner.name} is the Winner!`)
 
     if(isPlayerPokemon) {
+      const experience = this.calcExperience(loser)
+      await this.$text.setText(`${winner.name} gain ${experience} exp.!`)
+      winner.gainExperience(experience)
       const ai  = await this.$pkm.createRandomPokemon(15, 25)
       this.startBattle(this.player, ai)
+
     } else {
       this.player.heal()
     }
@@ -126,7 +130,6 @@ export default class Battle {
     const damage =  Math.ceil(((levelMultiplier * move.power * atkDefRatio / 50) + 2) * STAB * randomMultiplier * typeEffectivenessMultiplier)
     return {damage, effectivenessMessage}
   }
-
   calcRandomDamageMultiplier() {
     const min = 0.85
     const max = 1
@@ -158,6 +161,20 @@ export default class Battle {
 
   calcLevelMultiplier({level}) {
     return  (2 * level) / 5 + 2
+  }
+
+  calcExperience({level, evoGrade}){
+    const evoRanges = [
+      {min: 50, max: 90},
+      {min: 91, max: 180},
+      {min: 181, max: 250},
+    ]
+    const calcRandomExp = ({min, max}) => Math.floor(Math.random() * (max - min + 1)) + min
+    const participatedPokemons = 1
+    const isTrainerMultiplier = 1
+    const baseExp = calcRandomExp(evoRanges[evoGrade - 1])
+
+    return Math.ceil((level * isTrainerMultiplier * baseExp) / (7 * participatedPokemons))
   }
 
   getMessageByTypeEffectiveness(multiplier) {

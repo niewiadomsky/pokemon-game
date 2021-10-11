@@ -7,7 +7,12 @@ const pokemonApi = {
   pokemonJson: PokemonJson,
   movesJson: MovesJson,
   getPokemonInfo(name){
-    return this.pokemonJson[name]
+    const pokemon = this.pokemonJson[name]
+
+    if(pokemon.prevo)
+      pokemon.prevo = this.getPokemonInfo(pokemon.prevo.toLowerCase())
+
+    return pokemon
   },
   getPokemonInfoByNum(num){
     return Object.values(this.pokemonJson).find(pokemon => pokemon.num === num)

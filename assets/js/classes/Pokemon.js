@@ -69,8 +69,11 @@ export default class Pokemon {
     this.currentHp = this.stats.hp
   }
 
-  getTotalExperienceToNextLevel(){
-    const nextLevel = this.level + 1
+  gainExperience(experience){
+    this.experience += experience
+  }
+
+  getTotalExperienceForLevel(level){
     const {experienceMode} = this
 
     const modes = {
@@ -80,9 +83,8 @@ export default class Pokemon {
       slow: n => 5 * (Math.pow(n, 3)) / 5,
     }
 
-    return experienceMode in modes ? modes[this.experienceMode](nextLevel) : null
+    return experienceMode in modes ? Math.floor(modes[this.experienceMode](level)) : null
   }
-
 
   async setTypes(){
     const typeNames = this.species.types
@@ -112,11 +114,35 @@ export default class Pokemon {
     return this
   }
 
+  get evoGrade(){
+    const {prevo} = this.species
+
+    if(!prevo)
+      return 1
+
+
+    if(prevo && !prevo.prevo)
+      return 2
+
+    return 3
+
+  }
+
   get isDead(){
     return this.currentHp <= 0
   }
 
   get totalExperienceToNextLevel(){
-    return this.getTotalExperienceToNextLevel()
+    return this.getTotalExperienceForLevel(this.level + 1)
   }
+
+  get neededExperience(){
+    return this.totalExperienceToNextLevel - this.getTotalExperienceForLevel(this.level)
+  }
+
+  get experiencePercent(){
+    const {experience, neededExperience} = this
+    return Math.floor((experience / neededExperience) * 100)
+  }
+
 }
