@@ -28,40 +28,90 @@ export default class Battle {
     this.round++
   }
 
-  async useMove(move, isPlayer) {
-    const {ai, player,} = this
-    const attacker = isPlayer ? player : ai
-    const defender = isPlayer ? ai: player
+  async fightRound(playerMove) {
+    const {ai, player} = this
+    const aiMove = this.getAiRandomMove()
+    const isPlayerMoveFirst = this.isPlayerMoveFirst(playerMove, player, aiMove, ai)
 
+    const attacker = isPlayerMoveFirst ? player : ai
+    const defender = !isPlayerMoveFirst ? player : ai
+    const move = isPlayerMoveFirst ? playerMove : aiMove
+    const secondMove = !isPlayerMoveFirst ? playerMove : aiMove
+
+    let isDead = await this.useMove(move, attacker, defender)
+
+    if(isDead)
+      return this.endBattle(attacker)
+
+    isDead = await this.useMove(secondMove, defender, attacker)
+
+    if(isDead)
+      return this.endBattle(defender)
+
+    return false
+  }
+
+  async useMove(move, attacker, defender) {
     const {damage, effectivenessMessage} = this.calcDamage(move, attacker, defender)
 
     const isDead = defender.takeDamage(damage)
-    await this.$text.setText(`${!isPlayer ? 'Wild ' : ''}${attacker.name.toUpperCase()} used ${move.name.toUpperCase()}!`)
+    await this.$text.setText(`${this.isAiPokemon(attacker) ? 'Wild ' : ''}${attacker.name.toUpperCase()} used ${move.name.toUpperCase()}!`)
 
     if(effectivenessMessage)
       await this.$text.setText(effectivenessMessage)
 
     if(isDead) {
-      await this.$text.setText(`${!isPlayer ? 'Wild ' : ''}${defender.name.toUpperCase()} fainted!`)
+      await this.$text.setText(`${this.isAiPokemon(defender) ? 'Wild ' : ''}${defender.name.toUpperCase()} fainted!`)
     }
-    await this.endBattle(true)
+
     return isDead
   }
 
-  async endBattle(refight= false){
-    this.isFighting = false
+  isPlayerMoveFirst(
+    {priority: playerPriority = 0},
+    {stats: {spd: playerSpeed}},
+    {priority: aiPriority = 0},
+    {stats: {spd: aiSpeed}}) {
 
-    if(refight) {
+    const priority = playerPriority - aiPriority
+    const speed = playerSpeed - aiSpeed
+
+    return (priority === 0 ? speed : priority) >= 0
+  }
+
+  isPlayerPokemon(pokemon){
+    return this.player === pokemon
+  }
+
+  isAiPokemon(pokemon){
+    return this.ai === pokemon
+  }
+
+  getAiRandomMove(){
+    return this.ai.moves.sort(() => Math.random() - Math.random())[0]
+  }
+
+  async endBattle(winner){
+    this.isFighting = false
+    const isPlayerPokemon = this.isPlayerPokemon(winner)
+
+    await this.$text.setText(`${isPlayerPokemon ? 'Wild ' : ''}${winner.name} is the Winner!`)
+
+    if(isPlayerPokemon) {
       const ai  = await this.$pkm.createRandomPokemon(15, 25)
       this.startBattle(this.player, ai)
+    } else {
+      this.player.heal()
     }
+
     console.log('Battle Ended')
+    return winner
   }
 
   calcDamage(move, attacker, defender) {
     if(move.category !== 'special' && move.category !== 'physical' || !move.power) {
       console.log('Cant calculate damage', move)
-      return 0
+      return {damage: 0}
     }
 
     const levelMultiplier = this.calcLevelMultiplier(attacker)
@@ -90,7 +140,7 @@ export default class Battle {
 
   calcTypeEffectivenessMultiplier({type: moveType}, {types: pokemonTypes}) {
     return pokemonTypes.reduce((total, pokemonType) => {
-      return total * pokemonType.getMultiplierOfType(moveType.toLowerCase());
+      return total * pokemonType.getMultiplierOfType(moveType.toLowerCase())
     }, 1)
   }
 

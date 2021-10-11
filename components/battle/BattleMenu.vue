@@ -61,7 +61,9 @@ export default {
     useMove(move){
       this.$battle.nextRound(async() => {
         this.revertChoiceFight()
-        this.opponentIsDead = await this.$battle.useMove(move, true)
+        const result = await this.$battle.fightRound(move)
+        console.log(result)
+        // this.opponentIsDead = await this.$battle.useMove(move, true)
         this.$controller.selectOption(0)
       })
     },

@@ -65,6 +65,10 @@ export default class Pokemon {
     return this.isDead
   }
 
+  heal(){
+    this.currentHp = this.stats.hp
+  }
+
   getTotalExperienceToNextLevel(){
     const nextLevel = this.level + 1
     const {experienceMode} = this
