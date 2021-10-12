@@ -23,12 +23,12 @@ export default {
   }),
   async mounted() {
     const experience = localStorage.experience ? parseInt(localStorage.experience) : null
-    const level = localStorage.level ? parseInt(localStorage.level) : 5
+    const level = localStorage.level ? parseInt(localStorage.level) : 10
 
     const myMoves = this.$pkm.createMoves(['flamethrower', 'petal dance', 'fly', 'surf'])
     this.myPokemon = await this.$pkm.createPokemon('dragonite', level, 'female', myMoves, experience)
-
-    const opponent = await this.$pkm.createRandomPokemon(9, 10)
+    const {minOpponentLevel, maxOpponentLevel} = this.$nuxt.context.env;
+    const opponent = await this.$pkm.createRandomPokemon(minOpponentLevel, maxOpponentLevel)
 
     this.$battle.startBattle(this.myPokemon, opponent)
   },

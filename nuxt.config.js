@@ -61,6 +61,11 @@ export default {
   modules: [
   ],
 
+  env: {
+    maxOpponentLevel: 30,
+    minOpponentLevel: 20,
+  },
+
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
     extend(config, ctx) {

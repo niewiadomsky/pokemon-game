@@ -8,10 +8,12 @@ export default class Battle {
   isFighting = false
   $pkm
   $text
+  $env
 
-  constructor($pkm, $text) {
+  constructor($pkm, $text, $env) {
     this.$pkm = $pkm
     this.$text = $text
+    this.$env = $env
   }
 
   startBattle(player, ai) {
@@ -86,7 +88,7 @@ export default class Battle {
       await this.$text.setText(Messages.gainExperience(winner, experience))
       winner.gainExperience(experience)
 
-      const ai  = await this.$pkm.createRandomPokemon(30, 40)
+      const ai  = await this.$pkm.createRandomPokemon(this.$env.minOpponentLevel, this.$env.maxOpponentLevel)
       this.startBattle(this.player, ai)
 
     } else {

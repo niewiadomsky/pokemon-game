@@ -33,11 +33,12 @@ export default class Pokemon {
     this.moves = moves
     this.gender = gender
     this.experience = experience
+    console.log(experience)
     return this.prepareToBattle()
   }
 
   async prepareToBattle(){
-    this.calcStats()
+    this.stats = Formulas.calcStats(this)
     this.currentHp = this.stats.hp
     await this.setTypes()
     await this.setSprites()
@@ -49,25 +50,26 @@ export default class Pokemon {
     return this
   }
 
-  calcStats(){
-    const level = this.level
-    const baseStats = this.species.baseStats
-    const stats = this.stats
+  levelUp(){
+    this.level++
+    localStorage.setItem('level', this.level)
 
-    Object.keys(baseStats).forEach(stat =>
-        stats[stat] = stat === 'hp' ?
-          Formulas.calcMaxHp(baseStats[stat], level) :
-          Formulas.calcStat(baseStats[stat], level)
-      )
+    const beforeLevelUpStats = {...this.stats}
+    this.stats = Formulas.calcStats(this)
+    const diffStats = Formulas.diffStats(beforeLevelUpStats, this.stats)
+
+    console.log(diffStats)
+    this.currentHp += diffStats.hp
+
+
+    if(this.totalExperienceToNextLevel <= this.experience)
+      this.levelUp()
   }
 
   takeDamage(damage){
     const remainingHp = this.currentHp - damage
 
-    if(remainingHp <= 0)
-      this.currentHp = 0
-    else
-      this.currentHp = remainingHp
+    this.currentHp = remainingHp <= 0 ? 0 : remainingHp
 
     return this.isDead
   }
@@ -82,10 +84,7 @@ export default class Pokemon {
     localStorage.setItem('experience', this.experience)
 
     if(this.experiencePercent >= 100)
-      setTimeout(() => {
-        this.level++
-        localStorage.setItem('level', this.level)
-      }, 600)
+      setTimeout(this.levelUp.bind(this), 600)
   }
 
   async setTypes(){

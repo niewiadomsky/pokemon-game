@@ -22,6 +22,25 @@ export default class Formulas {
     return mode in modes ? Math.floor(modes[mode](level)) : 0
   }
 
+  static calcStats({level, species: {baseStats}}){
+    const stats = {}
+
+    Object.keys(baseStats).forEach(stat =>
+      stats[stat] = stat === 'hp' ?
+        Formulas.calcMaxHp(baseStats[stat], level) :
+        Formulas.calcStat(baseStats[stat], level)
+    )
+    return stats
+  }
+
+  static diffStats(oldStats, newStats){
+    const diff = {}
+
+    Object.keys(oldStats).forEach(stat => diff[stat] = newStats[stat] - oldStats[stat])
+
+    return diff
+  }
+
   /*
   * Battle formulas
   */

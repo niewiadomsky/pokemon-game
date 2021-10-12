@@ -95,6 +95,9 @@ export default {
         }
       }
     }
+  },
+  mounted(){
+    this.progressExpPercent = this.expPercent
   }
 }
 </script>

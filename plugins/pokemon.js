@@ -11,8 +11,10 @@ const pokemonApi = {
     name = name.replaceAll('-', '');
     const pokemon = this.pokemonJson[name]
 
-    if(pokemon.prevo)
-      pokemon.prevo = this.getPokemonInfo(pokemon.prevo.toLowerCase())
+    if(pokemon.prevo) {
+      const prevoName = pokemon.prevo instanceof Object ? pokemon.prevo.name : pokemon.prevo
+      pokemon.prevo = this.getPokemonInfo(prevoName.toLowerCase())
+    }
 
     return pokemon
   },
