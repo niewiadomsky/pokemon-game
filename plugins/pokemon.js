@@ -7,6 +7,8 @@ const pokemonApi = {
   pokemonJson: PokemonJson,
   movesJson: MovesJson,
   getPokemonInfo(name){
+    console.log(name)
+    name = name.replaceAll('-', '');
     const pokemon = this.pokemonJson[name]
 
     if(pokemon.prevo)
@@ -21,7 +23,7 @@ const pokemonApi = {
     try{
       return new Pokemon(this.getPokemonInfo(species), level, gender, moves, name)
     } catch (e) {
-      console.log(`Not found pokemon: ${name}`)
+      console.log(`Not found pokemon: ${name}`, e)
     }
   },
   createRandomPokemon(minLevel = 15, maxLevel = 25) {
@@ -50,7 +52,7 @@ const pokemonApi = {
     try {
       return new Move(this.getMoveInfo(moveName))
     } catch(e) {
-      console.log(`Not found move: ${moveName}`)
+      console.log(`Not found move: ${moveName}`, e)
     }
   },
   createMoves(moves){

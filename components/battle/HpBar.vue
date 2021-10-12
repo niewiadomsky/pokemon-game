@@ -23,7 +23,7 @@
         <div v-if="showExperience" class="hp-bar__experience">
           <div class="hp-bar__experience-label">EXP</div>
           <div class="hp-bar__experience-bar">
-            <div class="hp-bar__experience-bar--fill" :style="{width: `${Math.floor(expPercent)}%`}"></div>
+            <div class="hp-bar__experience-bar--fill" :class="{transition}" :style="{width: `${Math.floor(progressExpPercent)}%`}"></div>
           </div>
         </div>
       </div>
@@ -50,6 +50,10 @@ export default {
       default: false,
     }
   },
+  data: () => ({
+    transition: true,
+    progressExpPercent: 0,
+  }),
   computed: {
     genderIcon(){
       if(this.pokemon.gender === 'male')
@@ -74,6 +78,22 @@ export default {
         return 'medium'
 
       return 'high'
+    }
+  },
+  watch: {
+    expPercent: {
+      handler(newValue, oldValue){
+        this.progressExpPercent = newValue
+
+        if(newValue >= 100){
+
+          setTimeout(() => {
+            this.transition = false
+            this.progressExpPercent = 0
+            setTimeout(() => this.transition = true, 200)
+          }, 300)
+        }
+      }
     }
   }
 }
@@ -189,8 +209,10 @@ export default {
           width: $hp-bar-experience-width;
 
           &--fill {
+            &.transition {
+              transition: width .3s ease-in;
+            }
             @apply h-full;
-            transition: width .4s ease-out;
             background: $hp-bar-experience-color--fill;
           }
         }

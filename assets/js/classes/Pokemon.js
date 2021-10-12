@@ -1,4 +1,5 @@
-import PokemonSprite from "./PokemonSprite";
+import PokemonSprite from "./PokemonSprite"
+import Formulas from "./Formulas"
 
 export default class Pokemon {
   species
@@ -18,28 +19,34 @@ export default class Pokemon {
   }
   isShiny = false
   sprite
-  experience = 0
+  experience
   isLoaded = false
   experienceMode = 'fast'
   static GENDER_MALE = 'male'
   static GENDER_FEMALE = 'female'
   static GENDER_GENDERLESS = 'genderless'
 
-  constructor(species, level, gender, moves, name = null){
+  constructor(species, level, gender, moves, experience = null, name = null){
     this.species = species
     this.name = name ? name : species.name
     this.level = level
     this.moves = moves
     this.gender = gender
+    this.experience = experience
     return this.prepareToBattle()
   }
 
-  calcMaxHp(base, level){
-    return Math.floor(0.01 * 2 * base * level) + level + 10
-  }
+  async prepareToBattle(){
+    this.calcStats()
+    this.currentHp = this.stats.hp
+    await this.setTypes()
+    await this.setSprites()
+    this.isLoaded = true
 
-  calcStat(base, level){
-    return Math.floor(0.01 * 2 * base * level) + 5
+    if(!this.experience)
+      this.experience = Formulas.calcTotalExperienceForLevel(this.level)
+
+    return this
   }
 
   calcStats(){
@@ -49,8 +56,8 @@ export default class Pokemon {
 
     Object.keys(baseStats).forEach(stat =>
         stats[stat] = stat === 'hp' ?
-          this.calcMaxHp(baseStats[stat], level) :
-          this.calcStat(baseStats[stat], level)
+          Formulas.calcMaxHp(baseStats[stat], level) :
+          Formulas.calcStat(baseStats[stat], level)
       )
   }
 
@@ -71,19 +78,14 @@ export default class Pokemon {
 
   gainExperience(experience){
     this.experience += experience
-  }
 
-  getTotalExperienceForLevel(level){
-    const {experienceMode} = this
+    localStorage.setItem('experience', this.experience)
 
-    const modes = {
-      fast: n => (Math.pow(n, 3) * 4) / 5,
-      mediumFast: n => Math.pow(n, 3),
-      mediumSlow: n => (6/5) * Math.pow(n, 3) - 15 * n * n + 100 * n - 140,
-      slow: n => 5 * (Math.pow(n, 3)) / 5,
-    }
-
-    return experienceMode in modes ? Math.floor(modes[this.experienceMode](level)) : null
+    if(this.experiencePercent >= 100)
+      setTimeout(() => {
+        this.level++
+        localStorage.setItem('level', this.level)
+      }, 600)
   }
 
   async setTypes(){
@@ -104,28 +106,16 @@ export default class Pokemon {
     this.sprite = await new PokemonSprite(num, isShiny)
   }
 
-  async prepareToBattle(){
-    this.calcStats()
-    this.currentHp = this.stats.hp
-    await this.setTypes()
-    await this.setSprites()
-    this.isLoaded = true
-
-    return this
-  }
-
   get evoGrade(){
     const {prevo} = this.species
 
     if(!prevo)
       return 1
 
-
     if(prevo && !prevo.prevo)
       return 2
 
     return 3
-
   }
 
   get isDead(){
@@ -133,16 +123,26 @@ export default class Pokemon {
   }
 
   get totalExperienceToNextLevel(){
-    return this.getTotalExperienceForLevel(this.level + 1)
+    return Formulas.calcTotalExperienceForLevel(this.level + 1)
+  }
+
+  get totalExperienceForCurrentLevel(){
+    return Formulas.calcTotalExperienceForLevel(this.level)
   }
 
   get neededExperience(){
-    return this.totalExperienceToNextLevel - this.getTotalExperienceForLevel(this.level)
+    return this.totalExperienceToNextLevel - this.totalExperienceForCurrentLevel
+  }
+
+  get currentExperience(){
+    return this.experience - this.totalExperienceForCurrentLevel
   }
 
   get experiencePercent(){
-    const {experience, neededExperience} = this
-    return Math.floor((experience / neededExperience) * 100)
+    const {currentExperience, neededExperience} = this
+    const percent =  Math.floor((currentExperience / neededExperience) * 100)
+
+    return percent >= 100 ? 100 : percent
   }
 
 }

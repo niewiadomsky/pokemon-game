@@ -22,10 +22,13 @@ export default {
     myPokemon: null,
   }),
   async mounted() {
-    const myMoves = this.$pkm.createMoves(['flamethrower', 'petal dance', 'fly', 'surf'])
-    this.myPokemon = await this.$pkm.createPokemon('dragonite', 35, 'female', myMoves)
+    const experience = localStorage.experience ? parseInt(localStorage.experience) : null
+    const level = localStorage.level ? parseInt(localStorage.level) : 5
 
-    const opponent = await this.$pkm.createRandomPokemon(30, 40)
+    const myMoves = this.$pkm.createMoves(['flamethrower', 'petal dance', 'fly', 'surf'])
+    this.myPokemon = await this.$pkm.createPokemon('dragonite', level, 'female', myMoves, experience)
+
+    const opponent = await this.$pkm.createRandomPokemon(9, 10)
 
     this.$battle.startBattle(this.myPokemon, opponent)
   },
