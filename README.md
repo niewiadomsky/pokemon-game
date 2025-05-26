@@ -1,69 +1,100 @@
-# pokemon
+# 🎮 Pokemon Battle Game
 
-## Build Setup
+A web-based Pokemon battle simulator built with Nuxt.js that recreates the classic Pokemon battle experience in your browser. Battle against randomly generated opponents with your Pokemon team and experience authentic turn-based combat mechanics.
+
+
+## 🖼️ Screenshots
+
+![Battle board](screenshots/01.png)
+![Fight action](screenshots/02.png)
+
+> **Note**: Screenshots will be added once the development server is running. The game features a classic Pokemon battle layout with opponent Pokemon on the top-right, player Pokemon on the bottom-left, HP bars, and a battle menu system.
+
+## 🚀 Installation
+
+### Prerequisites
+
+- **Node.js** (version 14 or higher)
+- **npm** or **yarn** package manager
+
+### Quick Start
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd pokemon-game
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+
+   ```
+
+3. **Start the development server**
+
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser**
+   ```
+   Navigate to http://localhost:3000
+   ```
+
+## 🎯 How to Play
+
+1. Arrows for choose action (currently just fight) and moves
+2. z for confirm action
+3. x for back
+
+## 🛠️ Available Scripts
 
 ```bash
-# install dependencies
-$ npm install
+# Development server with hot reload
+npm run dev
 
-# serve with hot reload at localhost:3000
-$ npm run dev
+# Build for production
+npm run build
 
-# build for production and launch server
-$ npm run build
-$ npm run start
+# Start production server
+npm run start
 
-# generate static project
-$ npm run generate
+# Generate static files
+npm run generate
 ```
 
-For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
+## 🏗️ Technologies Used
 
-## Special Directories
-
-You can create the following extra directories, some of which have special behaviors. Only `pages` is required; you can delete them if you don't want to use their functionality.
-
-### `assets`
-
-The assets directory contains your uncompiled assets such as Stylus or Sass files, images, or fonts.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/assets).
-
-### `components`
-
-The components directory contains your Vue.js components. Components make up the different parts of your page and can be reused and imported into your pages, layouts and even other components.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/components).
-
-### `layouts`
-
-Layouts are a great help when you want to change the look and feel of your Nuxt app, whether you want to include a sidebar or have distinct layouts for mobile and desktop.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/layouts).
+- **[Nuxt.js](https://nuxtjs.org/)** - Vue.js framework for the application structure
+- **[Vue.js](https://vuejs.org/)** - Frontend framework for reactive components
+- **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first CSS framework for styling
+- **[Vuex](https://vuex.vuejs.org/)** - State management for battle controllers
+- **[SCSS](https://sass-lang.com/)** - CSS preprocessing for advanced styling
+- **[pokemon-assets](https://github.com/waydelyle/pokemon-assets)** - Official Pokemon data and sprites
 
 
-### `pages`
+### Pokemon Customization
 
-This directory contains your application views and routes. Nuxt will read all the `*.vue` files inside this directory and setup Vue Router automatically.
+To change the default player Pokemon, modify `/components/battle/BattleBoard.vue`:
 
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/get-started/routing).
+```javascript
+// Change these lines in the mounted() method
+const myMoves = this.$pkm.createMoves([
+  'flamethrower',
+  'petal dance',
+  'fly',
+  'surf',
+])
+this.myPokemon = await this.$pkm.createPokemon(
+  'dragonite',
+  level,
+  'female',
+  myMoves,
+  experience
+)
+```
 
-### `plugins`
-
-The plugins directory contains JavaScript plugins that you want to run before instantiating the root Vue.js Application. This is the place to add Vue plugins and to inject functions or constants. Every time you need to use `Vue.use()`, you should create a file in `plugins/` and add its path to plugins in `nuxt.config.js`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/plugins).
-
-### `static`
-
-This directory contains your static files. Each file inside this directory is mapped to `/`.
-
-Example: `/static/robots.txt` is mapped as `/robots.txt`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/static).
-
-### `store`
-
-This directory contains your Vuex store files. Creating a file in this directory automatically activates Vuex.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/store).
+**Enjoy battling!** 🔥⚡🌊🌿
